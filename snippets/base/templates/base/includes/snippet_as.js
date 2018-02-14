@@ -505,6 +505,12 @@ function popFromBlockList(snippetID) {
 }
 
 function addToBlockList(snippetID) {
+    {# In preview mode just log blocking #}
+    {% if preview %}
+    console.log("[preview mode] Blocked snippet: " + snippetID);
+    return;
+    {% endif %}
+
     var blockList = getBlockList();
     if (snippetID === undefined) {
         snippetID = ABOUTHOME_SHOWN_SNIPPET.campaign || ABOUTHOME_SHOWN_SNIPPET.id;
