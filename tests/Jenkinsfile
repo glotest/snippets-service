@@ -1,7 +1,13 @@
+#!/usr/bin/env groovy
+
 pipeline {
   agent any
   libraries {
     lib('fxtest@1.10')
+  }
+  triggers {
+    pollSCM('H/5 * * * *')
+    cron('*/10 * * * *')
   }
   options {
     ansiColor('xterm')
@@ -32,7 +38,7 @@ pipeline {
       steps {
         sh "pytest " +
           "-n=${PYTEST_PROCESSES} " +
-          "--color=yes " + 
+          "--color=yes " +
           "--junit-xml=tests/results/junit.xml --html=tests/results/index.html --self-contained-html " +
           "--log-raw=tests/results/raw.txt " +
           "--log-tbpl=tests/results/tbpl.txt " +
