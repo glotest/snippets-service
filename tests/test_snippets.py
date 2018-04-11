@@ -2,8 +2,6 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import json
-import re
 from xml.dom.minidom import parseString
 from xml.parsers.expat import ExpatError
 
@@ -14,7 +12,7 @@ from bs4 import BeautifulSoup
 REQUESTS_TIMEOUT = 20
 URL_TEMPLATE = '{}/{}/Firefox/default/default/default/en-US/{}/default/default/default/'
 
-_user_agent_firefox = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:10.0.1) Gecko/20100101 Firefox/10.0.1'
+_user_agent_firefox = 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:59.0) Gecko/20100101 Firefox/59.0'
 
 
 def _get_redirect(url, user_agent=_user_agent_firefox, locale='en-US'):
@@ -35,15 +33,6 @@ def test_response_codes(base_url, version, channel):
     url = URL_TEMPLATE.format(base_url, version, channel)
     r = _get_redirect(url)
     assert r.status_code in (requests.codes.ok, requests.codes.no_content)
-
-
-def test_legacy(base_url):
-    url = URL_TEMPLATE.format(base_url, '3', 'release')
-    soup = _parse_response(_get_redirect(url).content)
-    script = soup.find('script', type='text/javascript').text
-    snippet_json_string = re.search("JSON\.parse\('(.+)'\)", script).groups()[0]
-    snippet_set = json.loads(snippet_json_string.replace('%u', r'\u').decode('unicode-escape'))
-    assert isinstance(snippet_set, list), 'No snippet set found'
 
 
 @pytest.mark.parametrize(('channel'), ['aurora', 'beta', 'release'])
